@@ -8,7 +8,23 @@ package SQL::Concrete::Dollars;
 use SQL::Concrete ':noncore';
 BEGIN { our @ISA = 'SQL::Concrete' } # inherit import()
 
-sub sql_render { SQL::Concrete::Renderer->new( dollars => 1 )->render( @_ ) }
+sub sql_render { SQL::Concrete::Renderer::Dollars->new->render( @_ ) }
+
+package SQL::Concrete::Renderer::Dollars;
+
+BEGIN { our @ISA = 'SQL::Concrete::Renderer' }
+
+sub render {
+	my $self = shift;
+	local $self->{'placeholder_id'} = 0;
+	$self->SUPER::render( @_ );
+}
+
+sub render_bind {
+	my $self = shift;
+	push @{ $self->{'bind'} }, $_[0];
+	'$'.++$self->{'placeholder_id'};
+}
 
 1;
 
