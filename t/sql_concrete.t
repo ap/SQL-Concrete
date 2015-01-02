@@ -5,15 +5,20 @@ use Test::More 0.88; # for done_testing
 use Test::Differences;
 use Data::Dumper;
 use SQL::Concrete qw( :all );
+use SQL::Concrete::Dollars _prefix => 'dollar_', 'sql_render';
+
+my $do_dollars;
 
 sub sql_ok {
 	my $code = shift;
 	local $Test::Builder::Level = $Test::Builder::Level + 1;
 	s/\A\s+//, s/\s+\z// for $code;
 	my @result;
-	eval "\@result = sql_render $code; 1"
-		? eq_or_diff \@result, \@_, $code
-		: do { fail $code; diag $@ };
+	my $func = $do_dollars ? 'dollar_sql_render' : 'sql_render';
+	my $name = $do_dollars ? "(\$) $code" : $code;
+	eval "\@result = $func $code; 1"
+		? eq_or_diff \@result, \@_, $name
+		: do { fail $name; diag $@ };
 }
 
 sub sql_error_ok {
@@ -123,5 +128,14 @@ sql_ok q[ SELECT undef, [ undef ] ] =>
 	'(SELECT ?) AS tbl0', undef;
 sql_ok q[ SELECT undef, { a => undef } ] =>
 	'(SELECT ? AS a) AS tbl0', undef;
+
+# dollar placeholders
+$do_dollars = 1;
+sql_ok q[ \1 ]
+	=> '$1', 1;
+sql_ok q[ [ 1, 2, 3 ] ]
+	=> '$1, $2, $3', 1, 2, 3;
+sql_ok q[ { x => [ 1, sql([ 2 ]), 3 ], y => 4 } ]
+	=> '(x IN ($1, $2, $3) AND y=$4)', 1, 2, 3, 4;
 
 done_testing;

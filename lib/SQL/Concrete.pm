@@ -11,7 +11,8 @@ use Exporter::Tidy
 	clauses => [ qw( sql_values sql_set sql_select ) ],
 	CLAUSES => [ qw( VALUES SET SELECT ) ],
 	all     => [ qw( :core :util :CLAUSES ) ],
-	_map    => { VALUES => 'sql_values', SET => 'sql_set', SELECT => 'sql_select' };
+	_map    => { VALUES => 'sql_values', SET => 'sql_set', SELECT => 'sql_select' },
+	noncore => [ qw( :util :clauses :CLAUSES ) ]; # used internally by SQL::Concrete::Dollars
 
 sub sql_render { SQL::Concrete::Renderer->new->render( @_ ) }
 sub sql        { my @stuff = @_; bless sub { $_[0]->render_sql( @stuff ) }, __PACKAGE__ }
@@ -21,18 +22,19 @@ sub sql_select { my @stuff = @_; bless sub { $_[0]->render_select( @stuff ) }, _
 
 package SQL::Concrete::Renderer;
 
-use Object::Tiny::Lvalue qw( alias_id prev_item bind );
+use Object::Tiny::Lvalue qw( dollars alias_id placeholder_id prev_item bind );
 
 # our code references are blessed into this package
 # so that we can distinguish them from other code references
 sub _CODE_() { 'SQL::Concrete' }
 
-sub new { bless {}, shift }
+sub new { my $class = shift; bless { @_ }, $class }
 
 sub render {
 	my $self = shift;
 	local $self->{'bind'} = [];
 	local $self->{'alias_id'} = 0;
+	local $self->{'placeholder_id'} = $self->dollars ? 1 : 0;
 	my $sql = $self->render_sql( @_ );
 	return ( $sql, @{ $self->bind } );
 }
@@ -49,7 +51,7 @@ sub render_sql {
 
 		my $append
 			= ( not $type )         ? $self->prev_item = $item
-			: ( 'SCALAR' eq $type ) ? do { push @$bind, $$item; '?' }
+			: ( 'SCALAR' eq $type ) ? ( $self->bind_or_render_values( $$item ) )[0]
 			: ( 'ARRAY'  eq $type ) ? ( @$item ? join ', ', $self->bind_or_render_values( @$item ) : $self->error( 'empty array' ) )
 			: ( _CODE_   eq $type ) ? $item->( $self )
 			: ( 'HASH'   eq $type ) ? ( keys %$item ? undef : '1=1' ) # further handled below
@@ -87,7 +89,10 @@ sub bind_or_render_values {
 	map {
 		my $type = ref;
 		$self->error( "unrecognized $type value in aggregate" ) if $type and _CODE_ ne $type;
-		$type ? $_->( $self ) : do { push @{ $self->bind }, $_; '?' };
+		$type ? $_->( $self ) : do {
+			push @{ $self->bind }, $_;
+			map { $_ ? '$'.$_++ : '?' } $self->placeholder_id;
+		};
 	} @_;
 }
 
