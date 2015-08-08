@@ -221,7 +221,7 @@ having to have specific support for almost any of them.
 
 =item SQL::Abstract, trying to express it all:
 
- { name => { like => '%son' }, age => [ -and => { '>=', 10 }, { '<=', 20 } ] }
+ { name => { like => '%son' }, age => { '>=', 10, '<=', 20 } }
 
 =item SQL::Concrete, lacking syntactic shortcuts for this task:
 
