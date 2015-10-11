@@ -348,7 +348,7 @@ It optionally accepts a name for the table reference as its first argument:
  ()  SELECT nonsense => [1, 2, 3, 4]
  ->  '(SELECT ?, ?, ?, ?) AS nonsense', 1, 2, 3, 4
 
-You can pass an undefined value to ask it to autogenerate a name this will be
+You can pass an undefined value to ask it to autogenerate a name that will be
 unique to this query:
 
  ()  SELECT undef, [1, 2, 3, 4]
