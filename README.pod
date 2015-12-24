@@ -57,7 +57,7 @@ having to have specific support for almost any of them.
 
 =item SQL::Abstract, trying to express it all:
 
- { name => { like => '%son' }, age => [ -and => { '>=', 10 }, { '<=', 20 } ] }
+ { name => { like => '%son' }, age => { '>=', 10, '<=', 20 } }
 
 =item SQL::Concrete, lacking syntactic shortcuts for this task:
 
@@ -184,7 +184,7 @@ It optionally accepts a name for the table reference as its first argument:
  ()  SELECT nonsense => [1, 2, 3, 4]
  ->  '(SELECT ?, ?, ?, ?) AS nonsense', 1, 2, 3, 4
 
-You can pass an undefined value to ask it to autogenerate a name this will be
+You can pass an undefined value to ask it to autogenerate a name that will be
 unique to this query:
 
  ()  SELECT undef, [1, 2, 3, 4]
