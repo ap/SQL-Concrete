@@ -174,6 +174,8 @@ sub error {
 
 __END__
 
+=pod
+
 =head1 SYNOPSIS
 
  use SQL::Concrete ':all';
