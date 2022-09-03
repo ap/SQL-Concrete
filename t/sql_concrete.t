@@ -1,5 +1,4 @@
-use strict;
-use warnings;
+use strict; use warnings;
 
 use Test::More tests => 60;
 use Test::Differences;
