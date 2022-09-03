@@ -2,7 +2,7 @@ use 5.006; use strict; use warnings;
 
 package SQL::Concrete::Dollars;
 
-our $VERSION = '1.003';
+our $VERSION = '1.004';
 
 use SQL::Concrete ':noncore';
 BEGIN { our @ISA = 'SQL::Concrete' } # inherit import()
@@ -11,7 +11,7 @@ sub sql_render { SQL::Concrete::Renderer::Dollars->new->render( @_ ) }
 
 package SQL::Concrete::Renderer::Dollars;
 
-our $VERSION = '1.003';
+our $VERSION = '1.004';
 
 BEGIN { our @ISA = 'SQL::Concrete::Renderer' }
 

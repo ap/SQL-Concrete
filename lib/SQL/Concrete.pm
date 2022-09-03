@@ -2,7 +2,7 @@ use 5.006; use strict; use warnings;
 
 package SQL::Concrete;
 
-our $VERSION = '1.003';
+our $VERSION = '1.004';
 
 use Exporter::Tidy
 	core    => [ qw( sql_render ) ],
@@ -21,7 +21,7 @@ sub sql_select { my @stuff = @_; bless sub { $_[0]->render_select( @stuff ) }, _
 
 package SQL::Concrete::Renderer;
 
-our $VERSION = '1.003';
+our $VERSION = '1.004';
 
 use Object::Tiny::Lvalue qw( alias_id prev_item bind );
 
