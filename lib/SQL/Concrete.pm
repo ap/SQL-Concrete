@@ -2,7 +2,7 @@ use 5.006; use strict; use warnings;
 
 package SQL::Concrete;
 
-# ABSTRACT: render SQL from fragments and placeholders from data structures
+our $VERSION = '1.003';
 
 use Exporter::Tidy
 	core    => [ qw( sql_render ) ],
@@ -20,6 +20,8 @@ sub sql_values { my @stuff = @_; bless sub { $_[0]->render_values( @stuff ) }, _
 sub sql_select { my @stuff = @_; bless sub { $_[0]->render_select( @stuff ) }, __PACKAGE__ }
 
 package SQL::Concrete::Renderer;
+
+our $VERSION = '1.003';
 
 use Object::Tiny::Lvalue qw( alias_id prev_item bind );
 
@@ -171,6 +173,14 @@ sub error {
 1;
 
 __END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+SQL::Concrete - render SQL from fragments and placeholders from data structures
 
 =head1 SYNOPSIS
 
@@ -392,3 +402,5 @@ Exports everything from the C<:core>, C<:util>, and C<:CLAUSES> tags.
 =back
 
 Naturally you can also export any of these functions individually.
+
+=cut
